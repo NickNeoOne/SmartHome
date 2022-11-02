@@ -80,7 +80,7 @@ foreach($objRooms as $objr) {
       // Разный цвет текста
        if ($objs->getProperty('alive')==1) { $cn='<font title="Устройство доступно" class="green">'; $ce='</font>'; $dev_alive='<span>✓</span>';}
        elseif ($objs->getProperty('alive')==NULL ) { 
-              $dev_alive='<a href="https://mjdm.ru/Hints/SdAliveTimeout?skin=hint" target=_blank title="Устройство не передает данные о своем статусе, необходимо настроить его чтобы получать данные" color="grey"><span>⁈</span></a>'; 
+              $dev_alive='<a href="https://mjdm.ru/Hints/SdAliveTimeout?skin=hint" target=_blank title="Устройство не передает данные в свойство alive, необходимо настроить его чтобы получать данные" color="grey"><span>⁈</span></a>'; 
               $cn='<font color="grey">'; 
                $ce='</font>'; 
               }

@@ -86,6 +86,7 @@ foreach($objRooms as $objr) {
               }
        elseif ($objs->getProperty('alive')==0) { 
               $cn='<font title="Устройство НЕ доступно" class="red">'; $ce='</font>'; 
+// Если нужно(не нужно) проговаривание уведомления через функцию say раскоментируйте (закоментируйте) строку ниже.
               say('Устройство '.$objs->description. ' находящийся в комнате '. $objr->description .' не передает показания c '.$updt,2); 
               $dev_alive='<span>✗</span>';
               } 

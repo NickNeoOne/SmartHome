@@ -34,7 +34,7 @@ summary::-webkit-details-marker {display: none;}
 .green {color: green;}
 .red {color: red;}
 .grey {color: grey;}
-
+hr {width:50%; margin: 20px 0;	padding: 0;	height: 0;	border: none;	border-top: 2px dotted #ddd;}
 #customers th {
     padding-top: 12px;
     padding-bottom: 12px;
@@ -57,36 +57,36 @@ foreach($objRooms as $objr) {
        $f=1;
        echo '<center><details open>'.
          '<summary><big>'.
-         '<b>'. $objr->description .' </b><br>'.
-         '<hr style="width:50%; margin: 20px 0;	padding: 0;	height: 0;	border: none;	border-top: 2px dotted #ddd;">'.
+         '<b>'. $objr->description .'</b><br>'.
+         '<hr>'.
  //         '<b style="color:#ff0000">'. $objr->getProperty('Alarms').'</b>'.
          '</big></summary>';
        }    
 
-      if (!$t) { 
-       echo '<table id="customers">'; $t=1;
-       echo '<tr>';
-       echo '<th width=20px>ID</td>';
-       echo '<th width=20%>Название</td>';
-       echo '<th width=40px>Статус</td>';    
-       echo '<th width=50%>Описание</td>';
-//       echo '<th width=20%>Локация</td>';
-       echo '<th width=30px>Живой</td>';
-       echo '<th width=130px>Обновлен</td>';
-       echo '</tr>';
+          if (!$t) { echo "\n";
+       echo '<table id="customers">'; $t=1; echo "\n";
+       echo ' <tr>'; echo "\n";
+       echo '  <th width=20px>ID</th>'; echo "\n";
+       echo '  <th width=15%>Объект</th>'; echo "\n";
+	   echo '  <th width=25%>Имя устройства</th>'; echo "\n";
+       echo '  <th width=40px>Статус</th>';    echo "\n";
+       echo '  <th width=35%>Описание</th>'; echo "\n";
+//       echo '  <th width=20%>Локация</th>';
+       echo '  <th width=30px>Живой</th>'; echo "\n";
+       echo '  <th width=130px>Обновлен</th>'; echo "\n";
+       echo ' </tr>'; echo "\n";
       }  
     // Получаем время последнего обновления 
-    $updt=date("d.m.Y  H:i", ((int)$objs->getProperty('updated')));
+    $updt=date("d.m.Y  H:i", $objs->getProperty('updated'));
       // Разный цвет текста
        if ($objs->getProperty('alive')==1) { $cn='<font title="Устройство доступно" class="green">'; $ce='</font>'; $dev_alive='<span>✓</span>';}
        elseif ($objs->getProperty('alive')==NULL ) { 
-              $dev_alive='<a href="https://mjdm.ru/Hints/SdAliveTimeout?skin=hint" target=_blank title="Устройство не передает данные в свойство alive, необходимо настроить его чтобы получать данные" color="grey"><span>⁈</span></a>'; 
+              $dev_alive='<a href="https://mjdm.ru/Hints/SdAliveTimeout?skin=hint" target=_blank title="Устройство не передает данные о своем статусе, необходимо настроить его чтобы получать данные" color="grey"><span>⁈</span></a>'; 
               $cn='<font color="grey">'; 
                $ce='</font>'; 
               }
        elseif ($objs->getProperty('alive')==0) { 
               $cn='<font title="Устройство НЕ доступно" class="red">'; $ce='</font>'; 
-// Если нужно(не нужно) проговаривание уведомления через функцию say раскоментируйте (закоментируйте) строку ниже.
               say('Устройство '.$objs->description. ' находящийся в комнате '. $objr->description .' не передает показания c '.$updt,2); 
               $dev_alive='<span>✗</span>';
               } 
@@ -94,19 +94,25 @@ foreach($objRooms as $objr) {
  // Получаем статус устройства (включено/выключено)
      if ($objs->getProperty('status')==1) { $dev_status='<span style="color: orange;">☀</span>';}
        elseif ($objs->getProperty('status')==0)  { $dev_status='<span style="color: black;">☀</span>';}
-     else { $dev_status='<span > </span>'; }    
+     else { $dev_status='<span > </span>'; }
+ // дФормируем дополнительное описание
+     if ($objs->getProperty('batteryOperated')==1) { $dev_batteryOperated='<font >Устройство работает от батареи, заряд: '. $objs->getProperty('batteryLevel') .' %</font>';}
+     else { $dev_batteryOperated='<font >Устройство работает от сети</font>'; }
+
+	 
       // Напечатать имена и описание объектов
-      echo '<tr>';
-      echo '<td align=right>'.$cn.$objs->id.$ce.'</td>';
-      echo '<td> <a href="/panel/linkedobject.html?op=redirect&object='.$objs->object_title.'" target=_blank>'.$cn.$objs->object_title.$ce.'</a></td>';
-      echo '<td align=center>'.$cn.$dev_status.$ce.'</td>';      
-      echo '<td>'.$cn.$objs->description.$ce.'</td>';
- //     echo '<td>'.$cn.$locat[$objs->location_id].$ce.'</td>';
-      echo '<td align=center>'.$cn.$dev_alive.$ce.'</td>';
-      echo '<td nowrap align=center>'.$cn.$updt.$ce.'</td>';
-      echo '</tr>';
+      echo ' <tr>'; echo "\n";
+      echo '  <td align=right>'.$cn.$objs->id.$ce.'</td>';echo "\n";
+      echo '  <td> <a href="/panel/linkedobject.html?op=redirect&object='.$objs->object_title.'" target=_blank>'.$cn.$objs->object_title.$ce.'</a></td>'; echo "\n";
+      echo '  <td>'.$cn.$objs->description.$ce.'</td>'; echo "\n";
+      echo '  <td align=center>'.$cn.$dev_status.$ce.'</td>';      echo "\n";
+      echo '  <td>'.$cn.$dev_batteryOperated.$ce.'</td>'; echo "\n";
+ //     echo '  <td>'.$cn.$locat[$objs->location_id].$ce.'</td>'; echo "\n";
+      echo '  <td align=center>'.$cn.$dev_alive.$ce.'</td>'; echo "\n";
+      echo '  <td nowrap align=center>'.$cn.$updt.$ce.'</td>'; echo "\n";
+      echo ' </tr>'; echo "\n";
     }
   }
-  if ($t) { echo '</table>'; $t=0;} 
-  if ($f) { echo '</details></div><br />'; $f=0;} 
+  if ($t) { echo '</table>'; $t=0; echo "\n";} 
+  if ($f) { echo '</details><br>'; $f=0;} 
 }

@@ -77,7 +77,7 @@ foreach($objRooms as $objr) {
        echo ' </tr>'; echo "\n";
       }  
     // Получаем время последнего обновления 
-    $updt=date("d.m.Y  H:i", $objs->getProperty('updated'));
+    $updt=date("d.m.Y  H:i", ((int)$objs->getProperty('updated')));
       // Разный цвет текста
        if ($objs->getProperty('alive')==1) { $cn='<font title="Устройство доступно" class="green">'; $ce='</font>'; $dev_alive='<span>✓</span>';}
        elseif ($objs->getProperty('alive')==NULL ) { 

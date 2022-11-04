@@ -31,6 +31,7 @@ summary::-webkit-details-marker {display: none;}
 .green {color: green;}
 .red {color: red;}
 .grey {color: grey;}
+.blue {color: #0000FF;}
 .room {width:70%; cursor: pointer; border: 1px; font-size:30px; font-family: Open Sans, sans-serif; color: rgb(66, 139, 202);}
 .def_cursor {cursor: default;}
 .sticky {position: sticky;  top: 2em;  min-height: 2em;  }
@@ -43,7 +44,6 @@ foreach($objRooms as $objr) {
   foreach($objSensors as $objs) {
     $objs=getObject($objs['TITLE']);
     if ($objr->object_title == $objs->getProperty('LinkedRoom')) {
-    
       // При первом разе открыть спойлер с именем комнаты  
       if (!$f) {
        $f=1;
@@ -51,7 +51,6 @@ foreach($objRooms as $objr) {
        //'<b style="color:#ff0000">'. $objr->getProperty('Alarms').'</b>'.
        '</summary>';
        }    
-
        if (!$t) { 
         echo "\n";
         echo '<table id="customers">'; $t=1; echo "\n";
@@ -81,9 +80,14 @@ foreach($objRooms as $objr) {
         $cn='<font  class="green">'; $ce='</font>'; $dev_alive='<span class="def_cursor" title="Устройство доступно">✓</span>';
         break;
     case 0:
+        $Record = SQLSelectOne("SELECT archived FROM devices WHERE LINKED_OBJECT LIKE '{$objs->object_title}'"); 
+        $dev_arch = $Record['archived'];
+        if ($dev_arch!=1){
         $cn='<font  class="red">'; $ce='</font>'; 
         say('Устройство '.$objs->description. ' находящийся в комнате '. $objr->description .' не передает показания c '.$updt,2); 
-        $dev_alive='<span class="def_cursor" title="Устройство НЕ доступно">✗</span>';
+        $dev_alive='<span class="def_cursor" title="Устройство НЕ доступно">✗</span>';}
+        else { $dev_alive='<span class="def_cursor" title="Устройство НЕ доступно но находится архиве">✗</span>'; 
+               $cn='<font  class="blue">'; $ce='</font>'; }
         break;
     }
 

@@ -2,69 +2,69 @@
 # and is used to generate a web page with the availability status of simple devices, 
 # as well as notifications of unavailability. It is launched either by reference or through the periodic execution setting.
 # Thanks for the idea and sample code to the user "Bagir", you can read more here: https://mjdm.ru/forum/viewtopic.php?f=4&t=7657
-#
-$f=0; // флаг начала комнаты
-$t=0; // флаг начала таблицы
-//$locat=['','Дом','Балкон','Подсобка','Улица','Теплица','Курятник'];
 
 // получаем список комнат и сенсоров в виде массивов
 $objRooms=getObjectsByClass('Rooms');
 $objSensors=getObjectsByClass('SDevices');
-//$objSensors=getObjectsByClass('SSensors');
+
 echo '<!DOCTYPE html> <html><head>
 <style>
+.filterDiv {float: none; display: none; }
+.show {display: block;}
+.myBtnContainer {float: left; width: 150px; padding: .8em 1em calc(.8em + 3px);  position: sticky;  top: 8px;  }
+.container { overflow: hidden;}
+
+/* Стиль кнопок */
+.btn {  width: 150px; border: 1px solid grey; outline: none; padding: 12px 16px; background-color: #f1f1f1; cursor: pointer;}
+.btn:hover { background-color: #ddd;}
+.btn.active { background-color: #666; color: white;}
+.btn.reload { background-color: rgb(53,167,110); color: white;}
+
 #customers {font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; border-collapse: collapse; margin: auto;}
 #customers td, #customers th { border: 1px solid #ddd; padding: 8px;}
-#customers th { padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: #4792d1; color: white;}
+#customers th { padding-top: 12px; padding-bottom: 12px; text-align: center; background-color: #68a8d4; color: white;}
 #customers tr:nth-child(even){background-color: #f2f2f2;}
 #customers tr:hover {background-color: #ddd;}
 
 hr { margin: 10px 0;	padding: 0;	height: 0;	border: none;	border-top: 2px dotted #ddd;}
-a {text-decoration: none;}
-a:hover {text-decoration: underline;}
-a.button { font-weight: 700; color: white; text-decoration: none; padding: .8em 1em calc(.8em + 3px); border-radius: 3px; background: rgb(64,199,129); box-shadow: 0 -3px rgb(53,167,110) inset; transition: 0.2s;} 
-a.button:hover { background: rgb(53, 167, 110); }
-a.button:active { background: rgb(33,147,90); box-shadow: 0 3px rgb(33,147,90) inset;}
-
 span {font-size:30px; }
 summary::-webkit-details-marker {display: none;}
 .green {color: green;}
 .red {color: red;}
 .grey {color: grey;}
 .blue {color: #0000FF;}
-.room {width:70%; cursor: pointer; border: 1px; font-size:30px; font-family: Open Sans, sans-serif; color: rgb(66, 139, 202);}
 .def_cursor {cursor: default;}
-.sticky {position: sticky;  top: 2em;  min-height: 2em;  }
 </style>
-</head><body> <div class="sticky" align="right"><a href="#" class="button" onClick="window.location.reload( true );">Обновить</a> </div> ';
 
+</head><body>
+<div id="myBtnContainer" class="myBtnContainer">
+  <button class="btn reload" style="border: 1px solid green;" onClick="window.location.reload( true );"> Обновить </button>
+  <button class="btn active" onclick="filterSelection(\'all\')"> Показать все</button>';
 foreach($objRooms as $objr) {
   $objr=getObject($objr['TITLE']);
- 
-  foreach($objSensors as $objs) {
-    $objs=getObject($objs['TITLE']);
-    if ($objr->object_title == $objs->getProperty('LinkedRoom')) {
-      // При первом разе открыть спойлер с именем комнаты  
-      if (!$f) {
-       $f=1;
-       echo '<center><details open>'.'<summary class="room">'. $objr->description .'<br>'.'<hr>'.
-       //'<b style="color:#ff0000">'. $objr->getProperty('Alarms').'</b>'.
-       '</summary>';
-       }    
-       if (!$t) { 
+
+echo '<button class="btn" onclick="filterSelection(\''.$objr->description.'\')">' . $objr->description . '</button>';}
+echo '</div><br>';
+foreach($objRooms as $objr) {
+  $objr=getObject($objr['TITLE']);
+echo '<div class="container">  <div class="filterDiv '.$objr->description.'">';
+
         echo "\n";
         echo '<table id="customers">'; $t=1; echo "\n";
-        echo ' <tr>'; echo "\n";
+        echo ' <tr>	<th style="background-color: #4792d1;"  colspan="7">'. $objr->description .'</td> </tr>';
+         echo ' <tr>'; echo "\n";
         echo '  <th width=20px>ID</th>'; echo "\n";
         echo '  <th width=25%>Объект</th>'; echo "\n";
         echo '  <th width=35%>Имя устройства</th>'; echo "\n";
         echo '  <th width=80px>Статус</th>';    echo "\n";
         echo '  <th width=80px>Питание</th>'; echo "\n";
-        //echo '  <th width=20%>Локация</th>';
         echo '  <th width=80px>Активный</th>'; echo "\n";
         echo '  <th width=130px>Обновлен</th>'; echo "\n";
         echo ' </tr>'; echo "\n";
-       }  
+ 
+  foreach($objSensors as $objs) {
+    $objs=getObject($objs['TITLE']);
+    if ($objr->object_title == $objs->getProperty('LinkedRoom')) {
 
        // Получаем время последнего обновления 
        $updt=date("d.m.Y  H:i", ((int)$objs->getProperty('updated')));
@@ -72,7 +72,7 @@ foreach($objRooms as $objr) {
     // Разный цвет текста
     switch ($objs->getProperty('alive')) {
     case NULL:
-        $dev_alive='<a href="https://mjdm.ru/Hints/SdAliveTimeout?skin=hint" target=_blank color="grey"><span>⁈</span></a>'; 
+        $dev_alive='<a href="https://mjdm.ru/Hints/SdAliveTimeout?skin=hint" style="color: #CD5C5C; text-decoration: none;" target=_blank color="grey"><span>&#9888;</span></a>'; 
         $cn='<font title="Устройство не передает данные о своем статусе, необходимо настроить его чтобы получать данные" color="grey">'; 
         $ce='</font>';
         break;
@@ -120,12 +120,55 @@ foreach($objRooms as $objr) {
       echo '  <td>'.$cn.$objs->description.$ce.'</td>'; echo "\n";
       echo '  <td align=center>'.$cn.$dev_status.$ce.'</td>';      echo "\n";
       echo '  <td align=center>'.$cn.'<span class="def_cursor" title='.$dev_batteryLevel.'>'.$dev_batteryOperated.$ce.'<span></td>'; echo "\n";
-      //echo '  <td>'.$cn.$locat[$objs->location_id].$ce.'</td>'; echo "\n";
       echo '  <td align=center>'.$cn.$dev_alive.$ce.'</td>'; echo "\n";
       echo '  <td nowrap align=center>'.$cn.$updt.$ce.'</td>'; echo "\n";
       echo ' </tr>'; echo "\n";
     }
   }
-  if ($t) { echo '</table>'; $t=0; echo "\n";} 
-  if ($f) { echo '</details></div><br>'; $f=0;} 
+
+echo '</table><br></div>';
 }
+echo '<script>
+filterSelection("all")
+function filterSelection(c) {
+  var x, i;
+  x = document.getElementsByClassName("filterDiv");
+  if (c == "all") c = "";
+  for (i = 0; i < x.length; i++) {
+    w3RemoveClass(x[i], "show");
+    if (x[i].className.indexOf(c) > -1) w3AddClass(x[i], "show");
+  }
+}
+
+function w3AddClass(element, name) {
+  var i, arr1, arr2;
+  arr1 = element.className.split(" ");
+  arr2 = name.split(" ");
+  for (i = 0; i < arr2.length; i++) {
+    if (arr1.indexOf(arr2[i]) == -1) {element.className += " " + arr2[i];}
+  }
+}
+
+function w3RemoveClass(element, name) {
+  var i, arr1, arr2;
+  arr1 = element.className.split(" ");
+  arr2 = name.split(" ");
+  for (i = 0; i < arr2.length; i++) {
+    while (arr1.indexOf(arr2[i]) > -1) {
+      arr1.splice(arr1.indexOf(arr2[i]), 1);     
+    }
+  }
+  element.className = arr1.join(" ");
+}
+
+// Добавьте активный класс к текущей кнопке (выделите его)
+var btnContainer = document.getElementById("myBtnContainer");
+var btns = btnContainer.getElementsByClassName("btn");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function(){
+    var current = document.getElementsByClassName("active");
+    current[0].className = current[0].className.replace(" active", "");
+    this.className += " active";
+  });
+}
+</script>';
